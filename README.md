@@ -1,0 +1,1 @@
+# hc-daily-coupon-sync
