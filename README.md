@@ -1,1 +1,1 @@
-# hc-daily-coupon-sync
+# proxy-server
