@@ -23,7 +23,7 @@ creds[process.env.USERNAME] = process.env.PASSWORD;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var routes = require("./api/routes/appRoutes"); //importing route
+var routes = require("./api/routes/appRoutes"); //importing routed
 routes(app); //register the route
 app.use(function (req, res) {
   res.status(404).send({ error: req.originalUrl + " not found" });
