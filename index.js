@@ -118,4 +118,4 @@ class App{
     }
 }
 
-new App().saveToSalesforce();
+new App().init();
