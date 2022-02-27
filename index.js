@@ -37,8 +37,8 @@ const isSandbox = true;
 const urlPrefix = isSandbox ? 'test' : 'login';
 
 class App{
-    init(){
-        let csvFile = this.getFTPFile(); 
+    async init(){
+        let csvFile = await this.getFTPFile(); 
         let result = this.parseCSV(csvFile);
         this.saveToSalesforce(result);
     }
@@ -48,6 +48,7 @@ class App{
         c.on('ready', () => {
           c.get('foo.local-copy.txt', (err, stream) => {
             if (err) throw err;
+            console.log({stream})
             stream.once('close', () => c.end());
             stream.pipe(fs.createWriteStream('foo.local-copy.txt'));
           });
@@ -61,7 +62,21 @@ class App{
     }
 
     parseCSV(csv){
+        let lines = csv.split('\n');
+        let result = [];
 
+        let headers = lines[0].split(',');
+      
+        for(let i = 1; i < lines.length; i++){
+            let obj = {};
+            let currentLine = lines[i].split(',');
+            for(let j = 0; j < headers.length; j++){
+                obj[headers[j]] = currentLine[j];
+            }
+            result.push(obj);
+        }
+        console.log({result});
+        return result;
     }
 
     async saveToSalesforce(record){
@@ -79,8 +94,7 @@ class App{
                         console.error(e); 
                         reject(e)
                     }
-                    
-                    console.log(conn);
+                    console.log({accessToken: conn.accessToken});
                     // logged in user property
                     console.log('User ID: ' + userInfo.id);
                     console.log('Org ID: ' + userInfo.organizationId);
