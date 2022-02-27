@@ -47,14 +47,18 @@ class App{
         return new Promise((resolve) => {
             let c = new Client();
             c.on('ready', () => {
-              c.get('foo.local-copy.txt', (err, stream) => {
-                if (err) throw err;
-                console.log({stream})
-                stream.once('close', () => c.end());
-                let data = '';
-                stream.on('data', chunk => data += chunk);
-                stream.on('end', resolve(data));
-              });
+                console.log('ftp ready');
+                c.get('foo.local-copy.txt', (e, stream) => {
+                    if (e){
+                        console.error(e);
+                        resolve(e);
+                    } 
+                    console.log({stream})
+                    stream.once('close', () => c.end());
+                    let data = '';
+                    stream.on('data', chunk => data += chunk);
+                    stream.on('end', resolve(data));
+                });
             });
             // connect to localhost:21 as anonymous
             c.connect({ 
