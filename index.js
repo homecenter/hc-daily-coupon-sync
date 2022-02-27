@@ -44,21 +44,25 @@ class App{
     }
     
     async getFTPFile(){
-        let c = new Client();
-        c.on('ready', () => {
-          c.get('foo.local-copy.txt', (err, stream) => {
-            if (err) throw err;
-            console.log({stream})
-            stream.once('close', () => c.end());
-            stream.pipe(fs.createWriteStream('foo.local-copy.txt'));
-          });
-        });
-        // connect to localhost:21 as anonymous
-        c.connect({ 
-            host: FTP_HOSTNAME, 
-            user: FTP_USERNAME, 
-            password: FTP_PASSWORD 
-        });
+        return new Promise((resolve) => {
+            let c = new Client();
+            c.on('ready', () => {
+              c.get('foo.local-copy.txt', (err, stream) => {
+                if (err) throw err;
+                console.log({stream})
+                stream.once('close', () => c.end());
+                let data = '';
+                stream.on('data', chunk => data += chunk);
+                stream.on('end', resolve(data));
+              });
+            });
+            // connect to localhost:21 as anonymous
+            c.connect({ 
+                host: FTP_HOSTNAME, 
+                user: FTP_USERNAME, 
+                password: FTP_PASSWORD 
+            });
+        })
     }
 
     parseCSV(csv){
