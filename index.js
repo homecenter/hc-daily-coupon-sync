@@ -80,21 +80,21 @@ class App{
                         reject(e)
                     }
                     
-                    console.log(conn.accessToken);
-                    console.log(conn.instanceUrl);
+                    console.log(conn);
                     // logged in user property
-                    console.log("User ID: " + userInfo.id);
-                    console.log("Org ID: " + userInfo.organizationId);
+                    console.log('User ID: ' + userInfo.id);
+                    console.log('Org ID: ' + userInfo.organizationId);
                     resolve();
                 });
             })
         };
 
-        await login();
-        conn.sobject("Account")
+        let res = await login();
+        console.log({res});
+        conn.sobject('Account')
             .create({ Name : 'My Account #1' }, (err, ret) => {
                 if (err || !ret.success) { return console.error(err, ret); }
-                console.log("Created record id : " + ret.id);
+                console.log('Created record id : ' + ret.id);
                 // ...
         });
     }
