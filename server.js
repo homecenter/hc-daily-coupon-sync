@@ -13,11 +13,11 @@ console.log(`Your client_id_prod is ${process.env.client_id_prod}`);
 // mongoose instance connection url connection
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/ProxyServer");
-const creds = new Object();
-creds[process.env.USERNAME] = process.env.PASSWORD;
+const credentials = new Object();
+credentials[process.env.USERNAME] = process.env.PASSWORD;
 // app.use(
 //   basicAuth({
-//     users: creds,
+//     users: credentials,
 //   })
 // );
 app.use(bodyParser.urlencoded({ extended: true }));
