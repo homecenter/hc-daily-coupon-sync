@@ -64,12 +64,13 @@ class App{
             console.log({ 
                 host: FTP_HOSTNAME, 
                 user: FTP_USERNAME, 
-                password: FTP_PASSWORD 
+                password: FTP_PASSWORD
             });
             c.connect({ 
                 host: FTP_HOSTNAME, 
                 user: FTP_USERNAME, 
-                password: FTP_PASSWORD 
+                password: FTP_PASSWORD,
+                connTimeout: 50000
             });
         })
     }
