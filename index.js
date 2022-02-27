@@ -61,6 +61,11 @@ class App{
                 });
             });
             // connect to localhost:21 as anonymous
+            console.log({ 
+                host: FTP_HOSTNAME, 
+                user: FTP_USERNAME, 
+                password: FTP_PASSWORD 
+            });
             c.connect({ 
                 host: FTP_HOSTNAME, 
                 user: FTP_USERNAME, 
