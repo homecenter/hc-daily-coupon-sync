@@ -73,16 +73,21 @@ class App{
             }
         });
         const login = async () => {
-            conn.login(username, password, (err, userInfo) => {
-                if (err) { return console.error(err); }
-                
-                console.log(conn.accessToken);
-                console.log(conn.instanceUrl);
-                // logged in user property
-                console.log("User ID: " + userInfo.id);
-                console.log("Org ID: " + userInfo.organizationId);
-                return;
-            });
+            return new Promise((resolve, reject) => {
+                conn.login(username, password, (e, userInfo) => {
+                    if (e) { 
+                        console.error(e); 
+                        reject(e)
+                    }
+                    
+                    console.log(conn.accessToken);
+                    console.log(conn.instanceUrl);
+                    // logged in user property
+                    console.log("User ID: " + userInfo.id);
+                    console.log("Org ID: " + userInfo.organizationId);
+                    resolve();
+                });
+            })
         };
 
         await login();
