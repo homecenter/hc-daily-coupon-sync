@@ -2,6 +2,7 @@
 const fs = require('fs');
 const jsForce = require('jsforce');
 const Client = require('./api/utils/ftpUtil/connection');
+const http = require('http');
 const ProxyAgent = require('proxy-agent');
 
 const {

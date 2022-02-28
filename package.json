@@ -19,7 +19,9 @@
   "homepage": "https://github.com/vzhut/proxy-server#readme",
   "dependencies": {
     "ftp": "^0.3.10",
+    "http": "^0.0.1-security",
     "jsforce": "^1.11.0",
+    "proxy-agent": "^5.0.0",
     "socks-client": "^1.1.4"
   }
 }
