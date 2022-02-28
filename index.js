@@ -50,7 +50,7 @@ class App{
     }
     
     async getFTPFile(){
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             /*let c = new Client();
             c.on('ready', () => {
                 console.log('ftp ready');
