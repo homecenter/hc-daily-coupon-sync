@@ -83,10 +83,10 @@ class App{
                             reject(e)
                         } else {
                             //console.log({socket});
-                            let data = '';
-                            socket.on('data', (buffer) => {
-                                data += buffer;
-                                console.log(buffer)
+                            let csv = '';
+                            socket.on('data', (data) => {
+                                csv += data;
+                                console.log(data)
                             })
                             console.log({data}) // Hello
                             resolve(data)
