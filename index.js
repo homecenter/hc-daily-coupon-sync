@@ -76,42 +76,45 @@ class App{
             });*/
 
 
-      var server = {
-        host: process.env.FTP_HOSTNAME,
-        user: process.env.FTP_USERNAME,
-        password: process.env.FTP_PASSWORD,
-        port: 21,
-        socksproxy: proxyUrl.replace(":9293", ":1080"),
-      };
-      var c = new Client();
-      c.on("ready", function () {
-        c.get(
-          'sf-hc/CouponSelfPick220131.CSV',
-          (err, res) => {
-            if (err) {
-             
-            } else {
-              
-              console.log(res);
-            }
-          }
-        );
-      });
-      c.on("error", function (err) {
-        console.error("socksftp error: " + err);
-        
-        c.end();
-        console.log(err.code);
-        return;
-      });
-      c.connect(server, (e) => {
-        console.log(e);
-        if (attempts < 6) {
-          console.log("attempts ===>> " + attempts);
-        } else {
-          c.end();
-        }
-      });
+            let server = {
+                host: process.env.FTP_HOSTNAME,
+                user: process.env.FTP_USERNAME,
+                password: process.env.FTP_PASSWORD,
+                port: 21,
+                socksproxy: proxyUrl.replace(":9293", ":1080"),
+            };
+            let c = new Client();
+            c.on("ready", function () {
+                c.get(
+                'sf-hc/CouponSelfPick220131.CSV',
+                (err, res) => {
+                    if (err) {
+                        console.log({res});
+                        resolve(res)
+                    } else {
+                        console.log({res});
+                        reject(res)
+                    }
+                }
+                );
+            });
+            c.on("error", function (err) {
+                console.error("socksftp error: " + err);
+                
+                c.end();
+                console.log(err.code);
+                reject(res);
+            });
+            c.connect(server, (e) => {
+                console.log(e);
+                if (attempts < 6) {
+                    console.log("attempts ===>> " + attempts);
+                } else {
+                    c.end();
+                    console.log(err.code);
+                    reject(res);
+                }
+            });
         })
     }
 
@@ -129,7 +132,7 @@ class App{
             }
             result.push(obj);
         }
-        console.log({result});
+        console.log('parseCSV', {result});
         return result;
     }
 
