@@ -92,13 +92,18 @@ class App{
             c.on('ready', () => {
                 c.get(
                     '/sf-hc/CouponSelfPick220124.CSV',
-                    (e, res) => {
+                    (e, socket) => {
                         if (e) {
-                            console.log({e, res});
+                            console.log({e, socket});
                             reject(e)
                         } else {
-                            console.log({res});
-                            resolve(res)
+                            //console.log({socket});
+                            let received = '';
+                            socket.on('data', data => {
+                                received += data
+                                console.log(received) // Hello
+                            })
+                            resolve(received)
                         }
                     }
                 );
