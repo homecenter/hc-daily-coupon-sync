@@ -87,7 +87,7 @@ class App{
                             socket.setEncoding('utf8');
                             socket
                             .on('data', chunk => data += chunk)
-                            .on('end', data => resolve(data))
+                            .on('end', res => resolve(data))
                         }
                     }
                 );
