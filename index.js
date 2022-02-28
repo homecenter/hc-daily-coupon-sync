@@ -46,7 +46,7 @@ class App{
     }
     
     async getFTPFile(){
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             /*let c = new Client();
             c.on('ready', () => {
                 console.log('ftp ready');
@@ -89,11 +89,11 @@ class App{
                     'sf-hc/CouponSelfPick220131.CSV',
                     (e, res) => {
                         if (e) {
-                            console.log({res});
-                            resolve(res)
-                        } else {
                             console.log({e, res});
                             reject(e)
+                        } else {
+                            console.log({res});
+                            resolve(res)
                         }
                     }
                 );
