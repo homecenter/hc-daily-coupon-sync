@@ -165,6 +165,8 @@ class App{
               },
             };
 
+            console.log({options})
+
             /*const options = {
                 proxy: {
                     host: '147.234.25.69',//proxyUrl.replace(':9293', ''), // ipv4 or ipv6 or hostname
