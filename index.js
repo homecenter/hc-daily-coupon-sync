@@ -78,7 +78,7 @@ class App{
             let c = new Client();
             c.on('ready', () => {
                 try{
-                    console.log('fileDate', this.fileDate)
+                    console.log('file path', `/sf-hc/CouponSelfPick${key}.CSV`)
                     c.get(
                         `/sf-hc/CouponSelfPick${key}.CSV`,
                         (e, socket) => {
