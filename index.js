@@ -62,7 +62,8 @@ class App{
             let res = await this.updateCoupons(couponNumberList);
             console.log('updateCoupons', this.results);
         };
-        await this.createSummary();
+        let s = await this.createSummary();
+        return true;
     }
 
     async getFTPFile(){
