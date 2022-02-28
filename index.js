@@ -140,8 +140,9 @@ class App{
 
             const options = {
                 proxy: {
-                    host: proxyUrl.replace(':9293', ''), // ipv4 or ipv6 or hostname
+                    host: '147.234.25.69',//proxyUrl.replace(':9293', ''), // ipv4 or ipv6 or hostname
                     port: 1080,
+                    type: 5 // Proxy version (4 or 5)
                 },
               
                 command: 'connect', // SOCKS command (createConnection factory function only supports the connect command)
