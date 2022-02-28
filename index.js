@@ -4,6 +4,8 @@ const jsForce = require('jsforce');
 const Client = require('./api/utils/ftpUtil/connection');
 const http = require('http');
 const ProxyAgent = require('proxy-agent');
+const SocksClient = require('socks').SocksClient;
+
 
 const {
     FTP_HOSTNAME, 
@@ -131,10 +133,36 @@ class App{
                 agent: new ProxyAgent(proxyUrl)
             };
 
-            http.get(opts, (res) => {
+            /*http.get(opts, (res) => {
                 console.log(res.statusCode, res.headers);
                 res.pipe(process.stdout);
-            })
+            })*/
+
+            const options = {
+                proxy: {
+                    host: proxyUrl.replace(':9293', ''), // ipv4 or ipv6 or hostname
+                    port: 1080,
+                },
+              
+                command: 'connect', // SOCKS command (createConnection factory function only supports the connect command)
+              
+                destination: {
+                    host: FTP_HOSTNAME, // github.com (hostname lookups are supported with SOCKS v4a and 5)
+                    port: 21,
+                    user: FTP_USERNAME,
+                    password: FTP_PASSWORD,
+                }
+            };
+            
+            // Async/Await
+            try {
+                const info = await SocksClient.createConnection(options);
+                
+                console.log(info.socket);
+                // <Socket ...>  (this is a raw net.Socket that is established to the destination host through the given proxy server)
+            } catch (err) {
+                // Handle errors
+            }
         })
     }
 
