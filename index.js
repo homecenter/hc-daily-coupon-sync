@@ -59,7 +59,8 @@ class App{
         let couponNumberList = result.map(({iSerialNo}) => iSerialNo);
         await this.connectToSalesforce();
 
-        let {} = this.updateCoupons(couponNumberList);
+        let res = this.updateCoupons(couponNumberList);
+        console.log('updateCoupons', res)
         //this.createSummary()
         //this.saveToSalesforce(result);
     }
