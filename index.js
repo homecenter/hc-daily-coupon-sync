@@ -2,6 +2,7 @@
 const fs = require('fs');
 const jsForce = require('jsforce');
 const Client = require('./api/utils/ftpUtil/connection');
+const ProxyAgent = require('proxy-agent');
 
 const {
     FTP_HOSTNAME, 
@@ -83,7 +84,7 @@ class App{
                 port: 21,
                 socksproxy: proxyUrl.replace(':9293', ':1080'),
             };
-            let c = new Client();
+            /*let c = new Client();
             c.on('ready', () => {
                 c.get(
                     'sf-hc/CouponSelfPick220131.CSV',
@@ -114,7 +115,25 @@ class App{
                     console.log(e.code);
                     reject(res);
                 }
-            });
+            });*/
+
+
+            const opts = {
+                method: 'GET',
+                host: FTP_HOSTNAME,
+                path: `ftp://${FTP_HOSTNAME}/sf-hc/CouponSelfPick220131.CSV`,
+                // this is the important part!
+                // If no proxyUri is specified, then https://www.npmjs.com/package/proxy-from-env
+                // is used to get the proxyUri.
+                username: FTP_USERNAME,
+                password: FTP_PASSWORD,
+                agent: new ProxyAgent(proxyUri)
+            };
+
+            http.get(opts, (res) => {
+                console.log(res.statusCode, res.headers);
+                res.pipe(process.stdout);
+            })
         })
     }
 
