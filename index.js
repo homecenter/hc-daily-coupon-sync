@@ -5,6 +5,7 @@ const Client = require('./api/utils/ftpUtil/connection');
 const http = require('http');
 const ProxyAgent = require('proxy-agent');
 const SocksClient = require('socks').SocksClient;
+const url = require("url"),
 
 
 const {
