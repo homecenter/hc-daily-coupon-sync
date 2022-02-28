@@ -1,6 +1,7 @@
-const Client = require('ftp');
+// const Client = require('ftp');
 const fs = require('fs');
 const jsForce = require('jsforce');
+const Client = require("./api/utils/ftpUtil/connection");
 
 const {
     FTP_HOSTNAME, 
@@ -13,7 +14,8 @@ const {
     USERNAME_PROD,
     PASSWORD_PROD,
     USERNAME_SANDBOX,
-    PASSWORD_SANDBOX } = process.env;
+    PASSWORD_SANDBOX,
+    QUOTAGUARDSTATIC_URL: proxyUrl } = process.env;
 
 const {
     username,
@@ -45,7 +47,7 @@ class App{
     
     async getFTPFile(){
         return new Promise((resolve) => {
-            let c = new Client();
+            /*let c = new Client();
             c.on('ready', () => {
                 console.log('ftp ready');
                 c.get('foo.local-copy.txt', (e, stream) => {
@@ -71,7 +73,45 @@ class App{
                 user: FTP_USERNAME, 
                 password: FTP_PASSWORD,
                 connTimeout: 50000
-            });
+            });*/
+
+
+      var server = {
+        host: process.env.FTP_HOSTNAME,
+        user: process.env.FTP_USERNAME,
+        password: process.env.FTP_PASSWORD,
+        port: 21,
+        socksproxy: proxyUrl.replace(":9293", ":1080"),
+      };
+      var c = new Client();
+      c.on("ready", function () {
+        c.get(
+          'test.txt',
+          (err, res) => {
+            if (err) {
+             
+            } else {
+              
+              console.log(res);
+            }
+          }
+        );
+      });
+      c.on("error", function (err) {
+        console.error("socksftp error: " + err);
+        
+        c.end();
+        console.log(err.code);
+        return;
+      });
+      c.connect(server, (e) => {
+        console.log(e);
+        if (attempts < 6) {
+          console.log("attempts ===>> " + attempts);
+        } else {
+          c.end();
+        }
+      });
         })
     }
 
