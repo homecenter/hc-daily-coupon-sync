@@ -6,6 +6,7 @@ const http = require('http');
 const ProxyAgent = require('proxy-agent');
 const SocksClient = require('socks').SocksClient;
 const url = require("url");
+const { resolve } = require('path');
 
 
 const {
@@ -44,43 +45,27 @@ const isSandbox = true;
 const urlPrefix = isSandbox ? 'test' : 'login';
 
 class App{
+    conn = new jsForce.Connection({
+        oauth2: {
+            loginUrl: `https://${urlPrefix}.salesforce.com`,
+            clientId,
+            clientSecret
+        }
+    });
+
     async init(){
         let csvFile = await this.getFTPFile(); 
         let result = this.parseCSV(csvFile);
-        this.saveToSalesforce(result);
+        let couponNumberList = result.map(({iSerialNo}) => iSerialNo);
+        await this.connectToSalesforce();
+
+        let {} = this.updateCoupons(couponNumberList);
+        //this.createSummary()
+        //this.saveToSalesforce(result);
     }
     
     async getFTPFile(){
         return new Promise(async (resolve, reject) => {
-            /*let c = new Client();
-            c.on('ready', () => {
-                console.log('ftp ready');
-                c.get('foo.local-copy.txt', (e, stream) => {
-                    if (e){
-                        console.error(e);
-                        resolve(e);
-                    } 
-                    console.log({stream})
-                    stream.once('close', () => c.end());
-                    let data = '';
-                    stream.on('data', chunk => data += chunk);
-                    stream.on('end', resolve(data));
-                });
-            });
-            // connect to localhost:21 as anonymous
-            console.log({ 
-                host: FTP_HOSTNAME, 
-                user: FTP_USERNAME, 
-                password: FTP_PASSWORD
-            });
-            c.connect({ 
-                host: FTP_HOSTNAME, 
-                user: FTP_USERNAME, 
-                password: FTP_PASSWORD,
-                connTimeout: 50000
-            });*/
-
-
             let server = {
                 host: FTP_HOSTNAME,
                 user: FTP_USERNAME,
@@ -98,12 +83,10 @@ class App{
                             reject(e)
                         } else {
                             //console.log({socket});
-                            let received = '';
-                            socket.on('data', data => {
-                                received += data
-                                console.log(received) // Hello
-                            })
-                            resolve(received)
+                            let data = '';
+                            socket.on('data', buffer => data += buffer)
+                            console.log({data}) // Hello
+                            resolve(data)
                         }
                     }
                 );
@@ -124,84 +107,7 @@ class App{
                     console.log(e.code);
                     reject(res);
                 }
-            });
-
-
-            /*const opts = {
-                method: 'GET',
-                host: FTP_HOSTNAME,
-                path: `ftp://${FTP_HOSTNAME}/sf-hc/CouponSelfPick220131.CSV`,
-                // this is the important part!
-                // If no proxyUri is specified, then https://www.npmjs.com/package/proxy-from-env
-                // is used to get the proxyUri.
-                username: FTP_USERNAME,
-                password: FTP_PASSWORD,
-                agent: new ProxyAgent(proxyUrl)
-            };*/
-
-            /*http.get(opts, (res) => {
-                console.log(res.statusCode, res.headers);
-                res.pipe(process.stdout);
-            })*/
-            /*const proxy = url.parse(proxyUrl.replace(':9293', ':1080'));
-            const {host, port} = proxy.hostname;
-            const [userId, password] = proxy.auth.split(":")
-            const port = proxy.port || 1080;
-        
-            //Socks client
-            const options = {
-              proxy: {
-                host,
-                port,
-                type: 5,
-                userId,
-                password,
-              },
-              command: 'connect',
-              destination: {
-                host: FTP_HOSTNAME, // When using bind, it's best to give an estimation of the ip that will be connecting to the newly opened tcp port on the proxy server.
-                port: 21,
-                // user: FTP_USERNAME,
-                // password: FTP_PASSWORD,
-              },
-            };
-
-            console.log({options})*/
-
-            /*const options = {
-                proxy: {
-                    host: '147.234.25.69',//proxyUrl.replace(':9293', ''), // ipv4 or ipv6 or hostname
-                    port: 1080,
-                    type: 5 // Proxy version (4 or 5)
-                },
-              
-                command: 'connect', // SOCKS command (createConnection factory function only supports the connect command)
-              
-                destination: {
-                    host: FTP_HOSTNAME, // github.com (hostname lookups are supported with SOCKS v4a and 5)
-                    port: 21,
-                    user: FTP_USERNAME,
-                    password: FTP_PASSWORD,
-                }
-            };*/
-            
-            
-            // Async/Await
-            /*try {
-                console.log('SocksClient.createConnection');
-                const info = await SocksClient.createConnection(options);
-                
-                console.log(info.socket);
-                // <Socket ...>  (this is a raw net.Socket that is established to the destination host through the given proxy server)
-                info.socket.write(`GET /text HTTP/1.1\nHost: ${FTP_HOSTNAME}\n\n`);
-                info.socket.on('data', (data) => {
-                    console.log(data.toString()); // ip-api.com sees that the last proxy in the chain (104.131.124.203) is connected to it.
-                    
-                });
-            } catch (e) {
-                // Handle errors
-                console.error({e});
-            }*/
+            });           
         })
     }
 
@@ -223,46 +129,49 @@ class App{
         return result;
     }
 
-    async saveToSalesforce(records){
-        let conn = new jsForce.Connection({
-            oauth2: {
-                loginUrl: `https://${urlPrefix}.salesforce.com`,
-                clientId,
-                clientSecret
-            }
-        });
-        const login = async () => {
-            return new Promise((resolve, reject) => {
-                conn.login(username, password, (e, userInfo) => {
-                    if (e) { 
-                        console.error(e); 
-                        reject(e)
-                    }
-                    console.log({accessToken: conn.accessToken});
-                    // logged in user property
-                    console.log('User ID: ' + userInfo.id);
-                    console.log('Org ID: ' + userInfo.organizationId);
-                    resolve();
-                });
-            })
-        };
-
-        let res = await login();
-        console.log({res});
-        let record = {
-            Name: '',
-            DailyTotalCoupons__c: '',
-            SuccessfullyUpdatedCoupons__c: '',
-            FailedUpdateCoupons__c: '',
-            ListOfFailedCoupons__c: ''
-        }
-        conn.sobject('HC_DailyCouponSummary__c')
-            .create(record, (e, ret) => {
-                if (e || !ret.success) { return console.error(e, ret); }
-                console.log('Created record id : ' + ret.id);
-                // ...
-        });
+    async connectToSalesforce(){
+        return new Promise((resolve, reject) => {
+            this.conn.login(username, password, (e, userInfo) => {
+                if (e) { 
+                    console.error(e); 
+                    reject(e)
+                }
+                console.log({accessToken: conn.accessToken});
+                // logged in user property
+                console.log('User ID: ' + userInfo.id);
+                console.log('Org ID: ' + userInfo.organizationId);
+                resolve();
+            });
+        })
     }
+
+    async updateCoupons(couponNumberList){      
+        this.conn.query(`SELECT Id FROM Coupon__c WHERE CouponNumber__c IN (${couponNumberList.join(',')})`)
+        .update({Used__c: true}, 'Coupon__c', (e, res) => {
+            console.log('updateCoupons', {res});
+            if (e) {  
+                console.error(e); 
+                reject(e)
+            } else resolve(res)
+        })
+    }
+
+    async createSummary(couponsCount, successCount, failedCount){     
+        let record = {
+            Name: 'HC DCP 15-02-2022 ( today-1)',
+            DailyTotalCoupons__c: couponsCount || 0,
+            SuccessfullyUpdatedCoupons__c: successCount,
+            FailedUpdateCoupons__c: failedCount,
+            ListOfFailedCoupons__c: failedList
+        }
+
+        this.conn.sobject('HC_DailyCouponSummary__c')
+        .create(record, (e, ret) => {
+            if (e || !ret.success) { return console.error(e, ret); }
+            console.log('Created record id : ' + ret.id);
+            // ...
+        });
+    } 
 }
 
 new App().init();
