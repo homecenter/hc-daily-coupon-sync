@@ -5,10 +5,11 @@ const Client = require('./api/utils/ftpUtil/connection');
 const http = require('http');
 const ProxyAgent = require('proxy-agent');
 const SocksClient = require('socks').SocksClient;
-const url = require("url");
-const { resolve } = require('path');
+const url = require('url');
+require('dotenv').config();
+const moment = require('moment')
 
-
+const environment = process.env.ENVIRONMENT || 'sandbox';
 const {
     FTP_HOSTNAME, 
     FTP_USERNAME,
@@ -40,29 +41,31 @@ const {
         clientId: CLIENT_ID_SANDBOX,
         clientSecret: CLIENT_SECRET_SANDBOX,      
     }
-}['sandbox'];
-const isSandbox = true;
+}[environment];
+const isSandbox = environment === 'sandbox';
 const urlPrefix = isSandbox ? 'test' : 'login';
 
 class App{
     conn = new jsForce.Connection({
+        version: 53,
+        maxRequest: 200,
         oauth2: {
             loginUrl: `https://${urlPrefix}.salesforce.com`,
             clientId,
             clientSecret
         }
     });
+    fileDate = moment().subtract(1, 'days');
 
     async init(){
         let csvFile = await this.getFTPFile(); 
-        let result = this.parseCSV(csvFile);
-        let couponNumberList = result.map(({iSerialNo}) => iSerialNo);
+        let data = this.parseCSV(csvFile);
+        let couponNumberList = data.map(({iSerialNo}) => iSerialNo);
         await this.connectToSalesforce();
 
-        let res = this.updateCoupons(couponNumberList);
-        console.log('updateCoupons', res)
-        //this.createSummary()
-        //this.saveToSalesforce(result);
+        let results = this.updateCoupons(couponNumberList);
+        console.log('updateCoupons', results);
+        await this.createSummary(results);
     }
     
     async getFTPFile(){
@@ -74,10 +77,11 @@ class App{
                 port: 21,
                 socksproxy: proxyUrl.replace(':9293', ':1080'),
             };
+            let key = this.fileDate.format('YYMMDD');//220124;
             let c = new Client();
             c.on('ready', () => {
                 c.get(
-                    '/sf-hc/CouponSelfPick220124.CSV',
+                    `/sf-hc/CouponSelfPick${key}.CSV`,
                     (e, socket) => {
                         if (e) {
                             console.log({e, socket});
@@ -127,11 +131,11 @@ class App{
             }
             result.push(obj);
         }
-        console.log('parseCSV', {result});
         return result;
     }
 
     async connectToSalesforce(){
+        console.log('conn', this.conn)
         return new Promise((resolve, reject) => {
             this.conn
             .login(username, password, (e, userInfo) => {
@@ -139,38 +143,58 @@ class App{
                     console.error(e); 
                     reject(e)
                 }
-                console.log({accessToken: this.conn.accessToken});
+                console.log({userInfo, accessToken: this.conn.accessToken});
                 resolve();
             });
         })
     }
 
     async updateCoupons(couponNumberList){      
-        this.conn
-        .query(`SELECT Id FROM Coupon__c WHERE CouponNumber__c IN (${couponNumberList.join(',')})`)
-        .update({Used__c: true}, 'Coupon__c', (e, res) => {
-            console.log('updateCoupons', {res});
-            if (e) {  
-                console.error(e); 
+        let results = {success: [], failure: []}
+        new Promise((resolve, reject) => {
+            let records = couponNumberList.map((CouponNumber__c) => ({CouponNumber__c, Used__c: true}));
+    
+            var job = this.conn.bulk.createJob('Coupon__c', 'upsert', {extIdField: 'CouponNumber__c'});
+            var batch = job.createBatch();
+
+            batch.execute(records);
+            // listen for events
+            batch.on("error", (e) => { // fired when batch request is queued in server.
+                console.log('Error, batchInfo:', e);
                 reject(e)
-            } else resolve(res)
+            });
+            batch.on("queue", (batchInfo) => { // fired when batch request is queued in server.
+                console.log('queue, batchInfo:', batchInfo);
+            batch.poll(1000 /* interval(ms) */, 20000 /* timeout(ms) */); // start polling - Do not poll until the batch has started
+            });
+            batch.on("response", (rets) => { // fired when batch finished and result retrieved
+                for (var i = 0; i < rets.length; i++) {
+                    if (rets[i].success) {
+                        results.success.push(rets[i].CouponNumber__c)
+                    } else {
+                        results.failure.push(rets[i].CouponNumber__c)
+                    }
+                }
+                resolve(results);
+            });
         })
     }
 
-    async createSummary(couponsCount, successCount, failedCount){     
+    async createSummary({success, failure}){     
         let record = {
-            Name: 'HC DCP 15-02-2022 ( today-1)',
-            DailyTotalCoupons__c: couponsCount || 0,
-            SuccessfullyUpdatedCoupons__c: successCount,
-            FailedUpdateCoupons__c: failedCount,
-            ListOfFailedCoupons__c: failedList
+            Name: `HC DCP ${this.fileDate.format('DD-MM-YYYY')}`,
+            DailyTotalCoupons__c: success.length + failure.length,
+            SuccessfullyUpdatedCoupons__c: success.length,
+            FailedUpdateCoupons__c: failure.length,
+            ListOfFailedCoupons__c: failure.join(', ')
         }
 
+        console.log('Summary', record);
         this.conn
         .sobject('HC_DailyCouponSummary__c')
-        .create(record, (e, ret) => {
-            if (e || !ret.success) { return console.error(e, ret); }
-            console.log('Created record id : ' + ret.id);
+        .create(record, (e, res) => {
+            if (e || !res.success) { return console.error(e, res); }
+            console.log('Created record id : ' + res.id);
             // ...
         });
     } 
