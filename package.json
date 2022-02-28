@@ -24,9 +24,7 @@
     "moment": "^2.29.1",
     "proxy-agent": "^5.0.0",
     "socks": "^2.6.2",
-    "socks-client": "^1.1.4"
-  },
-  "devDependencies": {
+    "socks-client": "^1.1.4",
     "dotenv": "^16.0.0"
   }
 }
