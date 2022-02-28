@@ -5,6 +5,7 @@ const Client = require('./api/utils/ftpUtil/connection');
 const http = require('http');
 const ProxyAgent = require('proxy-agent');
 const SocksClient = require('socks').SocksClient;
+const SocksCliendt = require('socks').SocksClientOptions;
 const url = require("url");
 
 
@@ -141,20 +142,18 @@ class App{
             const proxy = url.parse(proxyUrl.replace(':9293', ':1080'));
             const host = proxy.hostname;
             const auth = proxy.auth;
-            const user = auth.split(":")[0];
-            const pass = auth.split(":")[1];
+            const userId = auth.split(":")[0];
+            const password = auth.split(":")[1];
             const port = proxy.port || 1080;
         
             //Socks client
             const options = {
               proxy: {
-                host,
+                ipaddress,
                 port,
                 type: 5,
-                authentication: {
-                  username: user,
-                  password: pass,
-                },
+                userId,
+                password,
               },
               command: "connect",
               destination: {
