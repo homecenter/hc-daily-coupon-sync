@@ -91,7 +91,7 @@ class App{
             let c = new Client();
             c.on('ready', () => {
                 c.get(
-                    '/sf-hc/CouponSelfPick220124.CSVcs',
+                    '/sf-hc/CouponSelfPick220124.CSV',
                     (e, res) => {
                         if (e) {
                             console.log({e, res});
