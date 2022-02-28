@@ -83,6 +83,7 @@ class App{
                             reject(e)
                         } else {
                             //console.log({socket});
+                            socket.setEncoding('utf8');
                             socket.on('data', data => resolve(data))
                         }
                     }
