@@ -111,7 +111,7 @@ class App{
 
     parseCSV(csv){
         console.log({csv});
-        let lines = csv.replace(/\s|\r/g, '').split('\n');
+        let lines = csv.replace(/ +/, '').split(/\n/);
         let result = [];
 
         let headers = lines[0].split(',');
