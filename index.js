@@ -136,7 +136,7 @@ class App{
                     console.error(e); 
                     reject(e)
                 }
-                console.log({accessToken: conn.accessToken});
+                console.log({accessToken: this.conn.accessToken});
                 // logged in user property
                 console.log('User ID: ' + userInfo.id);
                 console.log('Org ID: ' + userInfo.organizationId);
