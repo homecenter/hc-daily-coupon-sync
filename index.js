@@ -133,7 +133,7 @@ class App{
         return result;
     }
 
-    async saveToSalesforce(record){
+    async saveToSalesforce(records){
         let conn = new jsForce.Connection({
             oauth2: {
                 loginUrl: `https://${urlPrefix}.salesforce.com`,
