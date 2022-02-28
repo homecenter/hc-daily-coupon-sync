@@ -101,7 +101,6 @@ class App{
             });
             c.on('error', (e) => {
                 console.error('socksftp error', e);
-                
                 c.end();
                 console.log(e.code);
                 reject(res);
