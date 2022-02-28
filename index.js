@@ -160,8 +160,9 @@ class App{
                 
                 console.log(info.socket);
                 // <Socket ...>  (this is a raw net.Socket that is established to the destination host through the given proxy server)
-            } catch (err) {
+            } catch (e) {
                 // Handle errors
+                console.error({e});
             }
         })
     }
