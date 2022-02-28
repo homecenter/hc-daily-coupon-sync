@@ -88,7 +88,7 @@ class App{
                 c.get(
                     'sf-hc/CouponSelfPick220131.CSV',
                     (e, res) => {
-                        if (err) {
+                        if (e) {
                             console.log({res});
                             resolve(res)
                         } else {
@@ -171,7 +171,7 @@ class App{
         }
         conn.sobject('HC_DailyCouponSummary__c')
             .create(record, (e, ret) => {
-                if (err || !ret.success) { return console.error(e, ret); }
+                if (e || !ret.success) { return console.error(e, ret); }
                 console.log('Created record id : ' + ret.id);
                 // ...
         });
