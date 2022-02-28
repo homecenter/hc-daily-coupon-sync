@@ -77,32 +77,32 @@ class App{
 
 
             let server = {
-                host: process.env.FTP_HOSTNAME,
-                user: process.env.FTP_USERNAME,
-                password: process.env.FTP_PASSWORD,
+                host: FTP_HOSTNAME,
+                user: FTP_USERNAME,
+                password: FTP_PASSWORD,
                 port: 21,
                 socksproxy: proxyUrl.replace(":9293", ":1080"),
             };
             let c = new Client();
-            c.on("ready", function () {
+            c.on("ready", () => {
                 c.get(
-                'sf-hc/CouponSelfPick220131.CSV',
-                (err, res) => {
-                    if (err) {
-                        console.log({res});
-                        resolve(res)
-                    } else {
-                        console.log({res});
-                        reject(res)
+                    'sf-hc/CouponSelfPick220131.CSV',
+                    (e, res) => {
+                        if (err) {
+                            console.log({res});
+                            resolve(res)
+                        } else {
+                            console.log({e, res});
+                            reject(e)
+                        }
                     }
-                }
                 );
             });
-            c.on("error", function (err) {
-                console.error("socksftp error: " + err);
+            c.on("error", (e) => {
+                console.error("socksftp error: " + e);
                 
                 c.end();
-                console.log(err.code);
+                console.log(e.code);
                 reject(res);
             });
             c.connect(server, (e) => {
@@ -111,7 +111,7 @@ class App{
                     console.log("attempts ===>> " + attempts);
                 } else {
                     c.end();
-                    console.log(err.code);
+                    console.log(e.code);
                     reject(res);
                 }
             });
@@ -170,8 +170,8 @@ class App{
             ListOfFailedCoupons__c: ''
         }
         conn.sobject('HC_DailyCouponSummary__c')
-            .create(record, (err, ret) => {
-                if (err || !ret.success) { return console.error(err, ret); }
+            .create(record, (e, ret) => {
+                if (err || !ret.success) { return console.error(e, ret); }
                 console.log('Created record id : ' + ret.id);
                 // ...
         });
