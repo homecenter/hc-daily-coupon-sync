@@ -84,7 +84,10 @@ class App{
                         } else {
                             //console.log({socket});
                             let data = '';
-                            socket.on('data', buffer => data += buffer)
+                            socket.on('data', (buffer) => {
+                                data += buffer;
+                                console.log(buffer)
+                            })
                             console.log({data}) // Hello
                             resolve(data)
                         }
@@ -137,9 +140,6 @@ class App{
                     reject(e)
                 }
                 console.log({accessToken: this.conn.accessToken});
-                // logged in user property
-                console.log('User ID: ' + userInfo.id);
-                console.log('Org ID: ' + userInfo.organizationId);
                 resolve();
             });
         })
