@@ -86,7 +86,7 @@ class App{
       var c = new Client();
       c.on("ready", function () {
         c.get(
-          'test.txt',
+          'sf-hc/CouponSelfPick220131.CSV',
           (err, res) => {
             if (err) {
              
@@ -159,8 +159,15 @@ class App{
 
         let res = await login();
         console.log({res});
-        conn.sobject('Account')
-            .create({ Name : 'My Account #1' }, (err, ret) => {
+        let record = {
+            Name: '',
+            DailyTotalCoupons__c: '',
+            SuccessfullyUpdatedCoupons__c: '',
+            FailedUpdateCoupons__c: '',
+            ListOfFailedCoupons__c: ''
+        }
+        conn.sobject('HC_DailyCouponSummary__c')
+            .create(record, (err, ret) => {
                 if (err || !ret.success) { return console.error(err, ret); }
                 console.log('Created record id : ' + ret.id);
                 // ...
