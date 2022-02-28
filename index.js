@@ -138,7 +138,7 @@ class App{
                 console.log(res.statusCode, res.headers);
                 res.pipe(process.stdout);
             })*/
-            const proxy = url.parse(proxyUrl.replace(':9293', ':1080'));
+            /*const proxy = url.parse(proxyUrl.replace(':9293', ':1080'));
             const {host, port} = proxy.hostname;
             const [userId, password] = proxy.auth.split(":")
             const port = proxy.port || 1080;
@@ -161,7 +161,7 @@ class App{
               },
             };
 
-            console.log({options})
+            console.log({options})*/
 
             /*const options = {
                 proxy: {
