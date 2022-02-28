@@ -59,10 +59,10 @@ class App{
             let couponNumberList = data.map(({iSerialNo}) => iSerialNo);
             await this.connectToSalesforce();
     
-            let results = this.updateCoupons(couponNumberList);
-            console.log('updateCoupons', results);
+            await this.updateCoupons(couponNumberList);
+            console.log('updateCoupons', this.results);
         };
-        await this.createSummary(results);
+        await this.createSummary();
     }
     
     async getFTPFile(){
@@ -180,7 +180,8 @@ class App{
         })
     }
 
-    async createSummary({success, failure}){     
+    async createSummary(){     
+        let {success, failure} = this.results;
         let record = {
             Name: `HC DCP ${this.fileDate.format('DD-MM-YYYY')}`,
             DailyTotalCoupons__c: success.length + failure.length,
