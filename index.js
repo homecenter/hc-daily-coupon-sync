@@ -136,7 +136,6 @@ class App{
     }
 
     async connectToSalesforce(){
-        console.log('conn', this.conn)
         return new Promise((resolve, reject) => {
             this.conn
             .login(username, password, (e, userInfo) => {
