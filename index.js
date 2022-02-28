@@ -156,6 +156,7 @@ class App{
             
             // Async/Await
             try {
+                console.log('SocksClient.createConnection');
                 const info = await SocksClient.createConnection(options);
                 
                 console.log(info.socket);
