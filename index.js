@@ -86,7 +86,6 @@ class App{
                             let csv = '';
                             socket.on('data', data => {
                                 csv += data
-                                console.log(csv) // Hello
                             })
                             resolve(csv)
                         }
@@ -114,6 +113,7 @@ class App{
     }
 
     parseCSV(csv){
+        console.log({csv});
         let lines = csv.split('\n');
         let result = [];
 
