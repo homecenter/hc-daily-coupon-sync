@@ -113,15 +113,14 @@ class App{
     }
 
     parseCSV(csv){
-        console.log({csv});
-        let lines = csv.replace(/ +/, '').split(/\n/);
+        let lines = csv.replace(/\r/g, '').split(/\n/);
         let result = [];
 
-        let headers = lines[0].split(',');
+        let headers = lines[0].replace(/\s/g, '').split(',');
       
         for(let i = 1; i < lines.length; i++){
             let obj = {};
-            let currentLine = lines[i].split(',');
+            let currentLine = lines[i].replace(/\s/g, '').split(',');
             for(let j = 0; j < headers.length; j++){
                 obj[headers[j]] = currentLine[j];
             }
@@ -175,5 +174,4 @@ class App{
         });
     } 
 }
-
 new App().init();
