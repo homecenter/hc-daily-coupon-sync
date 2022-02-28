@@ -88,8 +88,8 @@ class App{
                                 csv += data;
                                 console.log(data)
                             })
-                            console.log({data}) // Hello
-                            resolve(data)
+                            console.log({csv}) // Hello
+                            resolve(csv)
                         }
                     }
                 );
