@@ -81,7 +81,7 @@ class App{
             });*/
 
 
-            /*let server = {
+            let server = {
                 host: FTP_HOSTNAME,
                 user: FTP_USERNAME,
                 password: FTP_PASSWORD,
@@ -91,7 +91,7 @@ class App{
             let c = new Client();
             c.on('ready', () => {
                 c.get(
-                    'sf-hc/CouponSelfPick220131.CSV',
+                    '/sf-hc/CouponSelfPick220124.CSVcs',
                     (e, res) => {
                         if (e) {
                             console.log({e, res});
@@ -119,7 +119,7 @@ class App{
                     console.log(e.code);
                     reject(res);
                 }
-            });*/
+            });
 
 
             /*const opts = {
@@ -139,27 +139,25 @@ class App{
                 res.pipe(process.stdout);
             })*/
             const proxy = url.parse(proxyUrl.replace(':9293', ':1080'));
-            const host = proxy.hostname;
-            const auth = proxy.auth;
-            const userId = auth.split(":")[0];
-            const password = auth.split(":")[1];
+            const {host, port} = proxy.hostname;
+            const [userId, password] = proxy.auth.split(":")
             const port = proxy.port || 1080;
         
             //Socks client
             const options = {
               proxy: {
-                host: host,
+                host,
                 port,
                 type: 5,
                 userId,
                 password,
               },
-              command: "connect",
+              command: 'connect',
               destination: {
                 host: FTP_HOSTNAME, // When using bind, it's best to give an estimation of the ip that will be connecting to the newly opened tcp port on the proxy server.
                 port: 21,
-                user: FTP_USERNAME,
-                password: FTP_PASSWORD,
+                // user: FTP_USERNAME,
+                // password: FTP_PASSWORD,
               },
             };
 
@@ -184,7 +182,7 @@ class App{
             
             
             // Async/Await
-            try {
+            /*try {
                 console.log('SocksClient.createConnection');
                 const info = await SocksClient.createConnection(options);
                 
@@ -198,7 +196,7 @@ class App{
             } catch (e) {
                 // Handle errors
                 console.error({e});
-            }
+            }*/
         })
     }
 
