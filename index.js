@@ -1,7 +1,7 @@
 // const Client = require('ftp');
 const fs = require('fs');
 const jsForce = require('jsforce');
-const Client = require("./api/utils/ftpUtil/connection");
+const Client = require('./api/utils/ftpUtil/connection');
 
 const {
     FTP_HOSTNAME, 
@@ -81,10 +81,10 @@ class App{
                 user: FTP_USERNAME,
                 password: FTP_PASSWORD,
                 port: 21,
-                socksproxy: proxyUrl.replace(":9293", ":1080"),
+                socksproxy: proxyUrl.replace(':9293', ':1080'),
             };
             let c = new Client();
-            c.on("ready", () => {
+            c.on('ready', () => {
                 c.get(
                     'sf-hc/CouponSelfPick220131.CSV',
                     (e, res) => {
@@ -98,8 +98,8 @@ class App{
                     }
                 );
             });
-            c.on("error", (e) => {
-                console.error("socksftp error: " + e);
+            c.on('error', (e) => {
+                console.error('socksftp error', e);
                 
                 c.end();
                 console.log(e.code);
@@ -108,7 +108,7 @@ class App{
             c.connect(server, (e) => {
                 console.log(e);
                 if (attempts < 6) {
-                    console.log("attempts ===>> " + attempts);
+                    console.log('attempts', attempts);
                 } else {
                     c.end();
                     console.log(e.code);
