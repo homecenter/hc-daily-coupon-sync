@@ -49,7 +49,7 @@ class App{
             clientSecret
         }
     });
-    fileDate = moment('2022-02-16T10:00:00').subtract(1, 'days');
+    fileDate = moment().subtract(1, 'days');
     results = {success: [], failure: []}
 
     async init(){
