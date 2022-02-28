@@ -168,6 +168,7 @@ class App{
             batch.poll(1000 /* interval(ms) */, 20000 /* timeout(ms) */); // start polling - Do not poll until the batch has started
             });
             batch.on("response", (rets) => { // fired when batch finished and result retrieved
+                console.log({rets})
                 for (var i = 0; i < rets.length; i++) {
                     if (rets[i].success) {
                         this.results.success.push(rets[i].CouponNumber__c)
