@@ -128,7 +128,7 @@ class App{
                 // is used to get the proxyUri.
                 username: FTP_USERNAME,
                 password: FTP_PASSWORD,
-                agent: new ProxyAgent(proxyUri)
+                agent: new ProxyAgent(proxyUrl)
             };
 
             http.get(opts, (res) => {
