@@ -62,7 +62,7 @@ class App{
             let res = await this.updateCoupons(couponNumberList);
             console.log('updateCoupons', this.results);
         };
-        let s = await this.createSummary();
+        //let s = await this.createSummary();
         return true;
     }
 
@@ -154,7 +154,7 @@ class App{
         new Promise((resolve, reject) => {
             let records = couponNumberList.map((CouponNumber__c) => ({CouponNumber__c, Used__c: true}));
     
-            var job = this.conn.bulk.createJob('Coupon__c', 'upsert', {extIdField: 'CouponNumber__c'});
+            var job = this.conn.bulk.createJob('Coupon__c', 'update', {extIdField: 'CouponNumber__c'});
             var batch = job.createBatch();
 
             batch.execute(records);
@@ -171,9 +171,9 @@ class App{
                 console.log({rets})
                 for (var i = 0; i < rets.length; i++) {
                     if (rets[i].success) {
-                        this.results.success.push(rets[i].CouponNumber__c)
+                        this.results.success.push(rets[i].id)
                     } else {
-                        this.results.failure.push(rets[i].CouponNumber__c)
+                        this.results.failure.push(rets[i].id)
                     }
                 }
                 resolve();
