@@ -80,14 +80,14 @@ class App{
             });*/
 
 
-            let server = {
+            /*let server = {
                 host: FTP_HOSTNAME,
                 user: FTP_USERNAME,
                 password: FTP_PASSWORD,
                 port: 21,
                 socksproxy: proxyUrl.replace(':9293', ':1080'),
             };
-            /*let c = new Client();
+            let c = new Client();
             c.on('ready', () => {
                 c.get(
                     'sf-hc/CouponSelfPick220131.CSV',
@@ -121,7 +121,7 @@ class App{
             });*/
 
 
-            const opts = {
+            /*const opts = {
                 method: 'GET',
                 host: FTP_HOSTNAME,
                 path: `ftp://${FTP_HOSTNAME}/sf-hc/CouponSelfPick220131.CSV`,
@@ -131,14 +131,39 @@ class App{
                 username: FTP_USERNAME,
                 password: FTP_PASSWORD,
                 agent: new ProxyAgent(proxyUrl)
-            };
+            };*/
 
             /*http.get(opts, (res) => {
                 console.log(res.statusCode, res.headers);
                 res.pipe(process.stdout);
             })*/
-
+            const proxy = url.parse(proxyUrl);
+            const host = proxy.hostname;
+            const auth = proxy.auth;
+            const user = auth.split(":")[0];
+            const pass = auth.split(":")[1];
+            const port = proxy.port || 1080;
+        
+            //Socks client
             const options = {
+              proxy: {
+                ipaddress: host,
+                host,
+                port,
+                type: 5,
+                command: "connect", // Since we are using bind, we must specify it here.
+                authentication: {
+                  username: user,
+                  password: pass,
+                },
+              },
+              target: {
+                host: FTP_HOSTNAME, // When using bind, it's best to give an estimation of the ip that will be connecting to the newly opened tcp port on the proxy server.
+                port: 21,
+              },
+            };
+
+            /*const options = {
                 proxy: {
                     host: '147.234.25.69',//proxyUrl.replace(':9293', ''), // ipv4 or ipv6 or hostname
                     port: 1080,
@@ -153,7 +178,8 @@ class App{
                     user: FTP_USERNAME,
                     password: FTP_PASSWORD,
                 }
-            };
+            };*/
+            
             
             // Async/Await
             try {
@@ -162,6 +188,11 @@ class App{
                 
                 console.log(info.socket);
                 // <Socket ...>  (this is a raw net.Socket that is established to the destination host through the given proxy server)
+                info.socket.write(`GET /text FTP/1.1\nHost: ${FTP_HOSTNAME}\n\n`);
+                info.socket.on('data', (data) => {
+                    console.log(data.toString()); // ip-api.com sees that the last proxy in the chain (104.131.124.203) is connected to it.
+                    
+                });
             } catch (e) {
                 // Handle errors
                 console.error({e});
