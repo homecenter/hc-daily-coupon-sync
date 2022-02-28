@@ -1,7 +1,7 @@
 const jsForce = require('jsforce');
 const Client = require('./connection');
 require('dotenv').config();
-const moment = require('moment')
+const moment = require('moment');
 
 const environment = process.env.ENVIRONMENT || 'sandbox';
 const {
@@ -49,7 +49,7 @@ class App{
             clientSecret
         }
     });
-    fileDate = moment().subtract(1, 'days');
+    fileDate = moment('16-02-2022').subtract(1, 'days');
     results = {success: [], failure: []}
 
     async init(){
