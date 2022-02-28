@@ -57,14 +57,14 @@ class App{
         if(csvFile){
             let data = this.parseCSV(csvFile);
             let couponNumberList = data.map(({iSerialNo}) => iSerialNo);
-            await this.connectToSalesforce();
+            let conn = await this.connectToSalesforce();
     
-            await this.updateCoupons(couponNumberList);
+            let res = await this.updateCoupons(couponNumberList);
             console.log('updateCoupons', this.results);
         };
         await this.createSummary();
     }
-    
+
     async getFTPFile(){
         return new Promise(async (resolve, reject) => {
             let server = {
