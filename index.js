@@ -1,11 +1,5 @@
-// const Client = require('ftp');
-const fs = require('fs');
 const jsForce = require('jsforce');
-const Client = require('./api/utils/ftpUtil/connection');
-const http = require('http');
-const ProxyAgent = require('proxy-agent');
-const SocksClient = require('socks').SocksClient;
-const url = require('url');
+const Client = require('./connection');
 require('dotenv').config();
 const moment = require('moment')
 
