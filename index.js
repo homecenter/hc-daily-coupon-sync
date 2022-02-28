@@ -84,10 +84,10 @@ class App{
                         } else {
                             //console.log({socket});
                             let csv = '';
-                            socket.on('data', data => {
-                                csv += data
-                            })
-                            resolve(csv)
+                            socket
+                            .on('data', data => csv += data)
+                            .pipe((data) => resolve(csv))
+                            
                         }
                     }
                 );
@@ -133,7 +133,8 @@ class App{
 
     async connectToSalesforce(){
         return new Promise((resolve, reject) => {
-            this.conn.login(username, password, (e, userInfo) => {
+            this.conn
+            .login(username, password, (e, userInfo) => {
                 if (e) { 
                     console.error(e); 
                     reject(e)
@@ -145,7 +146,8 @@ class App{
     }
 
     async updateCoupons(couponNumberList){      
-        this.conn.query(`SELECT Id FROM Coupon__c WHERE CouponNumber__c IN (${couponNumberList.join(',')})`)
+        this.conn
+        .query(`SELECT Id FROM Coupon__c WHERE CouponNumber__c IN (${couponNumberList.join(',')})`)
         .update({Used__c: true}, 'Coupon__c', (e, res) => {
             console.log('updateCoupons', {res});
             if (e) {  
@@ -164,7 +166,8 @@ class App{
             ListOfFailedCoupons__c: failedList
         }
 
-        this.conn.sobject('HC_DailyCouponSummary__c')
+        this.conn
+        .sobject('HC_DailyCouponSummary__c')
         .create(record, (e, ret) => {
             if (e || !ret.success) { return console.error(e, ret); }
             console.log('Created record id : ' + ret.id);
