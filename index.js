@@ -49,12 +49,12 @@ class App{
             clientSecret
         }
     });
-    fileDate = moment('16-02-2022').subtract(1, 'days');
+    fileDate = moment('2022-02-16T10:00:00').subtract(1, 'days');
     results = {success: [], failure: []}
 
     async init(){
         let csvFile = await this.getFTPFile();
-        if(!csvFile){
+        if(csvFile){
             let data = this.parseCSV(csvFile);
             let couponNumberList = data.map(({iSerialNo}) => iSerialNo);
             await this.connectToSalesforce();
