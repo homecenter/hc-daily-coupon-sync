@@ -138,7 +138,7 @@ class App{
                 console.log(res.statusCode, res.headers);
                 res.pipe(process.stdout);
             })*/
-            const proxy = url.parse(proxyUrl);
+            const proxy = url.parse(proxyUrl.replace(':9293', ':1080'));
             const host = proxy.hostname;
             const auth = proxy.auth;
             const user = auth.split(":")[0];
@@ -148,11 +148,9 @@ class App{
             //Socks client
             const options = {
               proxy: {
-                ipaddress: host,
                 host,
                 port,
                 type: 5,
-                command: "connect", // Since we are using bind, we must specify it here.
                 authentication: {
                   username: user,
                   password: pass,
