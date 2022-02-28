@@ -56,15 +56,18 @@ class App{
         }
     });
     fileDate = moment().subtract(1, 'days');
+    results = {success: [], failure: []}
 
     async init(){
-        let csvFile = await this.getFTPFile(); 
-        let data = this.parseCSV(csvFile);
-        let couponNumberList = data.map(({iSerialNo}) => iSerialNo);
-        await this.connectToSalesforce();
-
-        let results = this.updateCoupons(couponNumberList);
-        console.log('updateCoupons', results);
+        let csvFile = await this.getFTPFile();
+        if(!csvFile){
+            let data = this.parseCSV(csvFile);
+            let couponNumberList = data.map(({iSerialNo}) => iSerialNo);
+            await this.connectToSalesforce();
+    
+            let results = this.updateCoupons(couponNumberList);
+            console.log('updateCoupons', results);
+        };
         await this.createSummary(results);
     }
     
@@ -80,22 +83,27 @@ class App{
             let key = this.fileDate.format('YYMMDD');//220124;
             let c = new Client();
             c.on('ready', () => {
-                c.get(
-                    `/sf-hc/CouponSelfPick${key}.CSV`,
-                    (e, socket) => {
-                        if (e) {
-                            console.log({e, socket});
-                            reject(e)
-                        } else {
-                            //console.log({socket});
-                            let data = '';
-                            socket.setEncoding('utf8');
-                            socket
-                            .on('data', chunk => data += chunk)
-                            .on('end', res => resolve(data))
+                try{
+                    console.log('fileDate', this.fileDate)
+                    c.get(
+                        `/sf-hc/CouponSelfPick${key}.CSV`,
+                        (e, socket) => {
+                            if (e) {
+                                console.log({e, socket});
+                                reject(e)
+                            } else {
+                                //console.log({socket});
+                                let data = '';
+                                socket.setEncoding('utf8');
+                                socket
+                                .on('data', chunk => data += chunk)
+                                .on('end', res => resolve(data))
+                            }
                         }
-                    }
-                );
+                    );
+                } catch(e){
+                    console.error(e);
+                }
             });
             c.on('error', (e) => {
                 console.error('socksftp error', e);
@@ -150,7 +158,6 @@ class App{
     }
 
     async updateCoupons(couponNumberList){      
-        let results = {success: [], failure: []}
         new Promise((resolve, reject) => {
             let records = couponNumberList.map((CouponNumber__c) => ({CouponNumber__c, Used__c: true}));
     
@@ -170,12 +177,12 @@ class App{
             batch.on("response", (rets) => { // fired when batch finished and result retrieved
                 for (var i = 0; i < rets.length; i++) {
                     if (rets[i].success) {
-                        results.success.push(rets[i].CouponNumber__c)
+                        this.results.success.push(rets[i].CouponNumber__c)
                     } else {
-                        results.failure.push(rets[i].CouponNumber__c)
+                        this.results.failure.push(rets[i].CouponNumber__c)
                     }
                 }
-                resolve(results);
+                resolve();
             });
         })
     }
