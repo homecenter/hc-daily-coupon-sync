@@ -158,6 +158,7 @@ class App{
                   password: pass,
                 },
               },
+              command: "connect",
               target: {
                 host: FTP_HOSTNAME, // When using bind, it's best to give an estimation of the ip that will be connecting to the newly opened tcp port on the proxy server.
                 port: 21,
