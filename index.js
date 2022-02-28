@@ -5,7 +5,6 @@ const Client = require('./api/utils/ftpUtil/connection');
 const http = require('http');
 const ProxyAgent = require('proxy-agent');
 const SocksClient = require('socks').SocksClient;
-const SocksCliendt = require('socks').SocksClientOptions;
 const url = require("url");
 
 
@@ -149,7 +148,7 @@ class App{
             //Socks client
             const options = {
               proxy: {
-                ipaddress: host,
+                host: host,
                 port,
                 type: 5,
                 userId,
@@ -191,7 +190,7 @@ class App{
                 
                 console.log(info.socket);
                 // <Socket ...>  (this is a raw net.Socket that is established to the destination host through the given proxy server)
-                info.socket.write(`GET /text FTP/1.1\nHost: ${FTP_HOSTNAME}\n\n`);
+                info.socket.write(`GET /text HTTP/1.1\nHost: ${FTP_HOSTNAME}\n\n`);
                 info.socket.on('data', (data) => {
                     console.log(data.toString()); // ip-api.com sees that the last proxy in the chain (104.131.124.203) is connected to it.
                     
