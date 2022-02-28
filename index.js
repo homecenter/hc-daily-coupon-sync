@@ -149,7 +149,7 @@ class App{
             //Socks client
             const options = {
               proxy: {
-                ipaddress,
+                ipaddress: host,
                 port,
                 type: 5,
                 userId,
