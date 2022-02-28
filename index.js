@@ -83,8 +83,11 @@ class App{
                             reject(e)
                         } else {
                             //console.log({socket});
+                            let data = '';
                             socket.setEncoding('utf8');
-                            socket.on('data', data => resolve(data))
+                            socket
+                            .on('data', chunk => data += chunk)
+                            .on('end', data => resolve(data))
                         }
                     }
                 );
