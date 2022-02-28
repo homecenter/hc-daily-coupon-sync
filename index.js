@@ -83,11 +83,7 @@ class App{
                             reject(e)
                         } else {
                             //console.log({socket});
-                            let csv = '';
-                            socket
-                            .on('data', data => csv += data)
-                            .pipe((data) => resolve(csv))
-                            
+                            socket.on('data', data => resolve(data))
                         }
                     }
                 );
