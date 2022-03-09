@@ -58,7 +58,7 @@ class App{
             let data = this.parseCSV(csvFile);
             let couponNumberList = data.map(({iSerialNo}) => iSerialNo);
             let conn = await this.connectToSalesforce();
-    
+            console.log('couponNumberList', couponNumberList)
             let res = await this.updateCoupons(couponNumberList);
             console.log('updateCoupons', this.results);
         };
@@ -87,7 +87,6 @@ class App{
                                 console.log({e, socket});
                                 reject(e)
                             } else {
-                                //console.log({socket});
                                 let data = '';
                                 socket.setEncoding('utf8');
                                 socket
@@ -163,9 +162,9 @@ class App{
                 console.log('Error, batchInfo:', e);
                 reject(e)
             });
-            batch.on("queue", (batchInfo) => { // fired when batch request is queued in server.
-                console.log('queue, batchInfo:', batchInfo);
-            batch.poll(1000 /* interval(ms) */, 20000 /* timeout(ms) */); // start polling - Do not poll until the batch has started
+            batch.on("queue", ({id, jobId, state, createdDate}) => { // fired when batch request is queued in server.
+                console.log('queue, batchInfo:', {id, jobId, state, createdDate});
+                batch.poll(1000 /* interval(ms) */, 20000 /* timeout(ms) */); // start polling - Do not poll until the batch has started
             });
             batch.on("response", (rets) => { // fired when batch finished and result retrieved
                 console.log({rets})
