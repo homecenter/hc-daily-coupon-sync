@@ -153,7 +153,7 @@ class App{
         new Promise((resolve, reject) => {
             let records = couponNumberList.map((CouponNumber__c) => ({CouponNumber__c, Used__c: true}));
     
-            var job = this.conn.bulk.createJob('Coupon__c', 'update', {extIdField: 'CouponNumber__c'});
+            var job = this.conn.bulk.createJob('Coupon__c', 'upsert', {extIdField: 'CouponNumber__c'});
             var batch = job.createBatch();
 
             batch.execute(records);
