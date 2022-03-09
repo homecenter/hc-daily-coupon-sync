@@ -104,7 +104,7 @@ class App{
                 console.error('socksftp error', e);
                 c.end();
                 console.log(e.code);
-                reject(res);
+                reject(e);
             });
             c.connect(server, (e) => {
                 console.log(e);
@@ -113,7 +113,7 @@ class App{
                 } else {
                     c.end();
                     console.log(e.code);
-                    reject(res);
+                    reject(e);
                 }
             });           
         })
@@ -190,6 +190,19 @@ class App{
             FailedUpdateCoupons__c: failure.length,
             ListOfFailedCoupons__c: failure.join(', ')
         }
+
+        this.conn
+        .sobject('Coupon__c')
+        .retrieve([
+            ...success,
+            ...failure
+        ], function(err, accounts) {
+            if (err) { return console.error(err); }
+            for (var i=0; i < accounts.length; i++) {
+              console.log("Name : " + accounts[i].Name);
+            }
+            // ...
+        });
 
         console.log('Summary', record);
         this.conn
