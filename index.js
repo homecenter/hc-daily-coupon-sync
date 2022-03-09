@@ -53,17 +53,19 @@ class App{
     results = {success: [], failure: []}
 
     async init(){
-        let csvFile = await this.getFTPFile();
-        if(csvFile){
-            let data = this.parseCSV(csvFile);
-            let couponNumberList = data.map(({iSerialNo}) => iSerialNo);
-            let conn = await this.connectToSalesforce();
-            console.log('couponNumberList', couponNumberList)
-            let res = await this.updateCoupons(couponNumberList);
-            console.log('updateCoupons', this.results);
-        };
-        //let s = await this.createSummary();
-        return true;
+        setTimeout(() => {
+            let csvFile = await this.getFTPFile();
+            if(csvFile){
+                let data = this.parseCSV(csvFile);
+                let couponNumberList = data.map(({iSerialNo}) => iSerialNo);
+                let conn = await this.connectToSalesforce();
+                console.log('couponNumberList', couponNumberList)
+                let res = await this.updateCoupons(couponNumberList);
+                console.log('updateCoupons', this.results);
+            };
+            //let s = await this.createSummary();
+            return true;
+        }, 5000)
     }
 
     async getFTPFile(){
