@@ -52,8 +52,8 @@ class App{
     fileDate = moment().subtract(1, 'days');
     results = {success: [], failure: []}
 
-    async init(){
-        setTimeout(() => {
+    init(){
+        setTimeout(async () => {
             let csvFile = await this.getFTPFile();
             if(csvFile){
                 let data = this.parseCSV(csvFile);
