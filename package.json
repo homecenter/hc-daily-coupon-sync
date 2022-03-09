@@ -1,5 +1,5 @@
 {
-  "name": "proxy-server",
+  "name": "hc-coupons",
   "version": "1.0.0",
   "description": "Nodjs server as proxy for communicate salesforce and M3 crm",
   "main": "index.js",
