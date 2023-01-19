@@ -52,18 +52,20 @@ class App{
     fileDate = moment().subtract(1, 'days');
     results = {success: [], failure: []}
 
-    async init(){
-        let csvFile = await this.getFTPFile();
-        if(csvFile){
-            let data = this.parseCSV(csvFile);
-            let couponNumberList = data.map(({iSerialNo}) => iSerialNo);
-            let conn = await this.connectToSalesforce();
-    
-            let res = await this.updateCoupons(couponNumberList);
-            console.log('updateCoupons', this.results);
-        };
-        //let s = await this.createSummary();
-        return true;
+    init(){
+        setTimeout(async () => {
+            let csvFile = await this.getFTPFile();
+            if(csvFile){
+                let data = this.parseCSV(csvFile);
+                let couponNumberList = data.map(({iSerialNo}) => iSerialNo);
+                let conn = await this.connectToSalesforce();
+                console.log('couponNumberList', couponNumberList)
+                let res = await this.updateCoupons(couponNumberList);
+                console.log('updateCoupons', this.results);
+            };
+            //let s = await this.createSummary();x
+            return true;
+        }, 5000)
     }
 
     async getFTPFile(){
@@ -87,7 +89,6 @@ class App{
                                 console.log({e, socket});
                                 reject(e)
                             } else {
-                                //console.log({socket});
                                 let data = '';
                                 socket.setEncoding('utf8');
                                 socket
@@ -104,7 +105,7 @@ class App{
                 console.error('socksftp error', e);
                 c.end();
                 console.log(e.code);
-                reject(res);
+                reject(e);
             });
             c.connect(server, (e) => {
                 console.log(e);
@@ -113,7 +114,7 @@ class App{
                 } else {
                     c.end();
                     console.log(e.code);
-                    reject(res);
+                    reject(e);
                 }
             });           
         })
@@ -154,7 +155,7 @@ class App{
         new Promise((resolve, reject) => {
             let records = couponNumberList.map((CouponNumber__c) => ({CouponNumber__c, Used__c: true}));
     
-            var job = this.conn.bulk.createJob('Coupon__c', 'update', {extIdField: 'CouponNumber__c'});
+            var job = this.conn.bulk.createJob('Coupon__c', 'upsert', {extIdField: 'CouponNumber__c'});
             var batch = job.createBatch();
 
             batch.execute(records);
@@ -163,9 +164,9 @@ class App{
                 console.log('Error, batchInfo:', e);
                 reject(e)
             });
-            batch.on("queue", (batchInfo) => { // fired when batch request is queued in server.
-                console.log('queue, batchInfo:', batchInfo);
-            batch.poll(1000 /* interval(ms) */, 20000 /* timeout(ms) */); // start polling - Do not poll until the batch has started
+            batch.on("queue", ({id, jobId, state, createdDate}) => { // fired when batch request is queued in server.
+                console.log('queue, batchInfo:', {id, jobId, state, createdDate});
+                batch.poll(1000 /* interval(ms) */, 20000 /* timeout(ms) */); // start polling - Do not poll until the batch has started
             });
             batch.on("response", (rets) => { // fired when batch finished and result retrieved
                 console.log({rets})
@@ -190,6 +191,19 @@ class App{
             FailedUpdateCoupons__c: failure.length,
             ListOfFailedCoupons__c: failure.join(', ')
         }
+
+        this.conn
+        .sobject('Coupon__c')
+        .retrieve([
+            ...success,
+            ...failure
+        ], function(err, accounts) {
+            if (err) { return console.error(err); }
+            for (var i=0; i < accounts.length; i++) {
+              console.log("Name : " + accounts[i].Name);
+            }
+            // ...
+        });
 
         console.log('Summary', record);
         this.conn
