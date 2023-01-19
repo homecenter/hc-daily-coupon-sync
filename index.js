@@ -184,6 +184,7 @@ class App {
                 rets[i].errors.join(", ")
             );
           }
+          console.log("Batch execute", this.results);
         }
         resolve();
       });
