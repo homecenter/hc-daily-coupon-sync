@@ -61,7 +61,7 @@ class App {
         let conn = await this.connectToSalesforce();
         console.log("couponNumberList", couponNumberList);
         let res = await this.updateCoupons(couponNumberList);
-        console.log("updateCoupons", this.results);
+        // console.log("updateCoupons", this.results);
       }
       //   let s = await this.createSummary();
       return true;
