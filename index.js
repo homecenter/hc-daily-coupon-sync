@@ -178,7 +178,11 @@ class App {
           if (rets[i].success) {
             this.results.success.push(rets[i].id);
           } else {
-            this.results.failure.push(rets[i].id);
+            this.results.failure.push(
+              rets[i].id +
+                " error occurred, message = " +
+                rets[i].errors.join(", ")
+            );
           }
         }
         resolve();
