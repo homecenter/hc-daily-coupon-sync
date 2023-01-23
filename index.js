@@ -54,7 +54,6 @@ class App {
       do {
         let csvFile = await this.getFTPFile();
         if (LAST_UPDATED_DATE != null) this.fileDate.subtract(1, "days");
-        console.log(this.fileDate.format("YYMMDD"));
         if (csvFile) {
           let data = this.parseCSV(csvFile);
           let couponNumberList = data.reduce((acc, { iSerialNo }) => {
@@ -64,7 +63,7 @@ class App {
           let conn = await this.connectToSalesforce();
           console.log("couponNumberList", couponNumberList.length);
           let res = await this.updateCoupons(couponNumberList);
-          console.log("updateCoupons", this.results);
+          // console.log("updateCoupons", this.results);
         }
         // let s = await this.createSummary();
       } while (
