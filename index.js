@@ -76,7 +76,7 @@ class App {
         LAST_UPDATED_DATE != null
       );
       return true;
-    }, 5000);
+    }, 50000);
   }
 
   async getFTPFile() {
