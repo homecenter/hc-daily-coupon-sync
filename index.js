@@ -16,6 +16,7 @@ const {
   PASSWORD_PROD,
   USERNAME_SANDBOX,
   PASSWORD_SANDBOX,
+  LAST_UPDATED_DATE,
   QUOTAGUARDSTATIC_URL: proxyUrl,
 } = process.env;
 
@@ -48,22 +49,29 @@ class App {
   });
   fileDate = moment().subtract(1, "days");
   results = { success: [], failure: [] };
-
+  LAST_UPDATED_DATE = "230121";
   init() {
     setTimeout(async () => {
-      let csvFile = await this.getFTPFile();
-      if (csvFile) {
-        let data = this.parseCSV(csvFile);
-        let couponNumberList = data.reduce((acc, { iSerialNo }) => {
-          if (iSerialNo) acc.push(iSerialNo);
-          return acc;
-        }, []);
-        let conn = await this.connectToSalesforce();
-        console.log("couponNumberList", couponNumberList);
-        let res = await this.updateCoupons(couponNumberList);
-        // console.log("updateCoupons", this.results);
-      }
-      //   let s = await this.createSummary();
+      do {
+        // let csvFile = await this.getFTPFile();
+        if (LAST_UPDATED_DATE != null) this.fileDate.subtract(1, "days");
+        console.log(this.fileDate.format("YYMMDD"));
+        if (csvFile) {
+          let data = this.parseCSV(csvFile);
+          let couponNumberList = data.reduce((acc, { iSerialNo }) => {
+            if (iSerialNo) acc.push(iSerialNo);
+            return acc;
+          }, []);
+          // let conn = await this.connectToSalesforce();
+          console.log("couponNumberList", couponNumberList.length);
+          // let res = await this.updateCoupons(couponNumberList);
+          // console.log("updateCoupons", this.results);
+        }
+        //   let s = await this.createSummary();
+      } while (
+        this.fileDate.format("YYMMDD") != LAST_UPDATED_DATE &&
+        LAST_UPDATED_DATE != null
+      );
       return true;
     }, 5000);
   }
