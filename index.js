@@ -53,7 +53,7 @@ class App {
   init() {
     setTimeout(async () => {
       do {
-        // let csvFile = await this.getFTPFile();
+        let csvFile = await this.getFTPFile();
         if (LAST_UPDATED_DATE != null) this.fileDate.subtract(1, "days");
         console.log(this.fileDate.format("YYMMDD"));
         if (csvFile) {
