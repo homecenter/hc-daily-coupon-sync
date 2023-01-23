@@ -49,7 +49,6 @@ class App {
   });
   fileDate = moment().subtract(1, "days");
   results = { success: [], failure: [] };
-  LAST_UPDATED_DATE = "230121";
   init() {
     setTimeout(async () => {
       do {
@@ -62,12 +61,12 @@ class App {
             if (iSerialNo) acc.push(iSerialNo);
             return acc;
           }, []);
-          // let conn = await this.connectToSalesforce();
+          let conn = await this.connectToSalesforce();
           console.log("couponNumberList", couponNumberList.length);
-          // let res = await this.updateCoupons(couponNumberList);
-          // console.log("updateCoupons", this.results);
+          let res = await this.updateCoupons(couponNumberList);
+          console.log("updateCoupons", this.results);
         }
-        //   let s = await this.createSummary();
+        // let s = await this.createSummary();
       } while (
         this.fileDate.format("YYMMDD") != LAST_UPDATED_DATE &&
         LAST_UPDATED_DATE != null
