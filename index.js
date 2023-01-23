@@ -53,7 +53,6 @@ class App {
     setTimeout(async () => {
       do {
         let csvFile = await this.getFTPFile();
-        if (LAST_UPDATED_DATE != null) this.fileDate.subtract(1, "days");
         if (csvFile) {
           let data = this.parseCSV(csvFile);
           let couponNumberList = data.reduce((acc, { iSerialNo }) => {
@@ -61,11 +60,17 @@ class App {
             return acc;
           }, []);
           let conn = await this.connectToSalesforce();
-          console.log("couponNumberList", couponNumberList.length);
+          console.log(
+            "Date: " +
+              this.fileDate.format("YYMMDD") +
+              " couponNumberList" +
+              couponNumberList.length
+          );
           let res = await this.updateCoupons(couponNumberList);
           // console.log("updateCoupons", this.results);
         }
         // let s = await this.createSummary();
+        if (LAST_UPDATED_DATE != null) this.fileDate.subtract(1, "days");
       } while (
         this.fileDate.format("YYMMDD") != LAST_UPDATED_DATE &&
         LAST_UPDATED_DATE != null
