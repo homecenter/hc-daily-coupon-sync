@@ -55,8 +55,8 @@ class App {
         let csvFile = await this.getFTPFile();
         if (csvFile) {
           let data = this.parseCSV(csvFile);
-          let couponNumberList = data.reduce((acc, { iSerialNo }) => {
-            if (iSerialNo) acc.push(iSerialNo);
+          let couponNumberList = data.reduce((acc, { iSerialNo, iStoreId, dtTicketDate }) => {
+            if (iSerialNo) acc.push({ 'iSerialNo': iSerialNo, 'iStoreId': iStoreId, 'dtTicketDate': dtTicketDate });
             return acc;
           }, []);
           let conn = await this.connectToSalesforce();
@@ -158,11 +158,21 @@ class App {
     });
   }
 
+  convertDate(dt) {
+    if (dt) {
+      return dt.split('/')[2] + '-' + dt.split('/')[1] + '-' + dt.split('/')[0];
+    } else {
+      return dt;
+    }
+  }
+
   async updateCoupons(couponNumberList) {
     new Promise((resolve, reject) => {
-      let records = couponNumberList.map((CouponNumber__c) => ({
-        CouponNumber__c,
-        Used__c: true,
+      let records = couponNumberList.map((coupon) => ({
+        CouponNumber__c: coupon.iSerialNo,
+        iStoreId__c: coupon.iStoreId,
+        Used_Date_Coupon__c: this.convertDate(coupon.dtTicketDate),
+        Used__c: true
       }));
 
       var job = this.conn.bulk.createJob("Coupon__c", "upsert", {
